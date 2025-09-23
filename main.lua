@@ -29,7 +29,7 @@ local symptoms = {
     "Apakah anus pasien benjol dan tidak bisa keluar?",
     "Apakah benjolan pada anus pasien keluar dan bisa masuk sendiri?",
     "Apakah benjolan pada anus pasien keluar dan secara manual harus secara manual dimasukan oleh tangan?",
-    "Apakah pasien nyeri diperut di bagian kanan bawah?"
+    "Apakah pasien nyeri diperut di bagian kanan bawah?",
     "Apakah pasien bab lebih dari 3 kali dalam beberapa jam dan disertai muntah?"
 };
 
