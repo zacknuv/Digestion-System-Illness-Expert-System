@@ -34,15 +34,15 @@ local symptoms = {
 };
 
 local illnesses = {
-    "Gastritis",
-    "Kolotis Uselratif",
-    "Pankreatitis Akut",
-    "Diare Akut atau Gastroentritis",
-    "Infeksi Saluran Bawah (Usus Besar)",
-    "Hemeroid Grade I",
-    "Hemeroid Grade II",
-    "Hemeroid Grade III",
-    "Usus Buntuk (Apendiks)"
+    [1986]       = "Gastritis",
+    [14393]      = "Kolotis Uselratif",
+    [245774]     = "Pankreatitis Akut",
+    [2151415859] = "Diare Akut atau Gastroentritis",
+    [29360162]   = "Infeksi Saluran Bawah (Usus Besar)",
+    [234881024]  = "Hemeroid Grade I",
+    [369098752]  = "Hemeroid Grade II",
+    [637534208]  = "Hemeroid Grade III",
+    [1074790403] = "Usus Buntuk (Apendiks)"
 }
 
 function love.load()
@@ -50,22 +50,63 @@ function love.load()
     idx = 1
 end
 
-function love.update(dt)
-    idx = idx + dt
+local isEnterPressed = false
+function love.keypressed(key, _, _)
+    if key == "return" then
+        isEnterPressed = true
+    end
 end
 
+local isMouseClicked = false
+function love.mousepressed(_, _, button, _, _)
+    if button == 1 then
+        isMouseClicked = true
+    end
+end
+
+local bits = 0x0
 function love.draw()
     love.graphics.setBackgroundColor(0.2, 0.2, 0.2)
 
-    local halfWidth = love.graphics.getWidth() * 0.5
-    local halfHeight = love.graphics.getHeight() * 0.5
+    local x = love.graphics.getWidth() * 0.5
+    local y = love.graphics.getHeight() * 0.5
+    if idx > #symptoms then
+        guiText("Pasien Terdiagnosa Penyakit:", regularFont, x, y, x)
+        y = y + 80
 
-    local text = symptoms[math.floor(idx) % #symptoms]
-    drawText(text, regularFont, halfWidth, halfHeight, halfWidth)
+        local text = illnesses[bits]
+        if text then
+            guiText(text, regularFont, x, y, x)
+        else
+            guiText("Penyakit Tak Dikenal!", regularFont, x, y, x)
+        end
+
+        return
+    end
+
+    guiText("Pertanyaan " .. idx, regularFont, x, y, x)
+    y = y + 60
+
+    local text = symptoms[idx]
+    guiText(text, regularFont, x, y, x)
+    y = y + 160
+
+    if guiButton("Ya", regularFont, x - 130, y, 120) then
+        bits = bit.bor(bits, bit.lshift(1, idx - 1))
+        idx = idx + 1
+    end
+
+    if guiButton("Tidak", regularFont, x + 30, y, 120) then
+        idx = idx + 1
+    end
+
+    isEnterPressed = false
+    isMouseClicked = false
 end
 
-function drawText(text, font, x, y, width)
+function guiText(text, font, x, y, width)
     love.graphics.setFont(font)
+    love.graphics.setColor(1.0, 1.0, 1.0)
 
     local _, lines = font:getWrap(text, width)
     local textHeight = font:getHeight(text)
@@ -73,4 +114,40 @@ function drawText(text, font, x, y, width)
         local halfLineWidth = font:getWidth(v) * 0.5
         love.graphics.print(v, x - halfLineWidth, y + (i * textHeight))
     end
+end
+
+function guiButton(text, font, x, y, width)
+    love.graphics.setFont(font)
+
+    local hovered = false
+    local cursorX, cursorY = love.mouse.getPosition()
+    if cursorX > x and cursorX < (x + width) 
+        and cursorY > y and cursorY < (y + 48) then
+        hovered = true
+    end
+
+    local activated = hovered and (isMouseClicked or isEnterPressed)
+    if acitvated then
+        love.graphics.setColor(0.2, 0.2, 0.2)
+    elseif hovered then
+        love.graphics.setColor(0.7, 0.8, 0.7)
+    else
+        love.graphics.setColor(0.5, 0.5, 0.5)
+    end
+
+    love.graphics.rectangle("fill", x, y, width, 48)
+
+    x = (x + width * 0.5) - font:getWidth(text) * 0.5
+    y = (y + 24) - font:getHeight(text) * 0.5
+
+    if activated then
+        love.graphics.setColor(0.3, 0.3, 0.3)
+    elseif hovered then
+        love.graphics.setColor(1.0, 1.0, 1.0)
+    else
+        love.graphics.setColor(0.9, 0.9, 0.9)
+    end
+    love.graphics.print(text, x, y)
+
+    return activated
 end
