@@ -46,11 +46,31 @@ local illnesses = {
 }
 
 function love.load()
+    regularFont = love.graphics.newFont("assets/Jersey25-Regular.ttf", 32)
+    idx = 1
 end
 
 function love.update(dt)
+    idx = idx + dt
 end
 
 function love.draw()
     love.graphics.setBackgroundColor(0.2, 0.2, 0.2)
+
+    local halfWidth = love.graphics.getWidth() * 0.5
+    local halfHeight = love.graphics.getHeight() * 0.5
+
+    local text = symptoms[math.floor(idx) % #symptoms]
+    drawText(text, regularFont, halfWidth, halfHeight, halfWidth)
+end
+
+function drawText(text, font, x, y, width)
+    love.graphics.setFont(font)
+
+    local _, lines = font:getWrap(text, width)
+    local textHeight = font:getHeight(text)
+    for i, v in ipairs(lines) do
+        local halfLineWidth = font:getWidth(v) * 0.5
+        love.graphics.print(v, x - halfLineWidth, y + (i * textHeight))
+    end
 end
